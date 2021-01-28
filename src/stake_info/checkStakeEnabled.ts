@@ -56,8 +56,7 @@ const checkStakeEnabled = (() => {
     // },
     errorsCheck: [
       {
-        selector:
-          '.bet-card-wrap__BetCardWrap-muhxrm-0 .bet-card__LockedMatch-mhg7ic-1',
+        selector: '[class*="bet-card__LockedMatch"]',
         message: 'заблокирована',
       },
     ],
