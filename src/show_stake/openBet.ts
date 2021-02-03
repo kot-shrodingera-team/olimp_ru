@@ -44,14 +44,12 @@ const openBet = async (): Promise<boolean> => {
     return;
   }
   // ЦУПИС
-  await getElement(
-    '.full-match__FullMatchStyled-sc-1n5hpsg-1 .styled__GroupOutcomes-lrm95y-0'
-  );
+  await getElement('[class*="FullMatchStyled"] [class*="GroupOutcomes"]');
   await sleep(1500);
 
   const outcomeGroups = [
     ...document.querySelectorAll(
-      '.full-match__FullMatchStyled-sc-1n5hpsg-1 .styled__GroupOutcomes-lrm95y-0'
+      '[class*="FullMatchStyled"] [class*="GroupOutcomes"]'
     ),
   ];
   outcomeGroups.forEach((group) => {
@@ -61,7 +59,7 @@ const openBet = async (): Promise<boolean> => {
   });
   const outcomeGroupLists = [
     ...document.querySelectorAll(
-      '.full-match__FullMatchStyled-sc-1n5hpsg-1 ul.common__List-sc-1p0w8dw-1'
+      '[class*="FullMatchStyled"] [class*="GroupOutcomes"] ul[class*="List"]'
     ),
   ];
   let outcome = null;
