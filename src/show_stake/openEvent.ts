@@ -13,7 +13,6 @@ const openEvent = async (): Promise<void> => {
     log('Уже открыто нужное событие', 'steelblue');
     return;
   }
-  log('Переходим на Live');
   const live = document.querySelector('[href="/live"]') as HTMLElement;
   if (!live) {
     throw new JsFailError('Не найдена кнопка перехода на Live');
@@ -27,7 +26,7 @@ const openEvent = async (): Promise<void> => {
   if (!event) {
     throw new JsFailError('Событие не найдено');
   }
-  log('Нашли событие', 'steelblue');
+  log('Переходим на событие', 'orange');
   event.click();
 };
 
