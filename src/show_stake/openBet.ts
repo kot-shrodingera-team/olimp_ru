@@ -1,9 +1,4 @@
-import {
-  awaiter,
-  getElement,
-  log,
-  sleep,
-} from '@kot-shrodingera-team/germes-utils';
+import { awaiter, getElement, log } from '@kot-shrodingera-team/germes-utils';
 import { getReactInstance } from '@kot-shrodingera-team/germes-utils/reactUtils';
 import { OutcomeGroupList } from '../bookmakerApi';
 import isClone from '../isClone';
@@ -44,41 +39,51 @@ const openBet = async (): Promise<boolean> => {
     return;
   }
   // ЦУПИС
+  log(`Ищем ставку "${worker.BetName}"`, 'steelblue');
   await getElement('[class*="FullMatchStyled"] [class*="GroupOutcomes"]');
-  await sleep(1500);
 
-  const outcomeGroups = [
-    ...document.querySelectorAll(
-      '[class*="FullMatchStyled"] [class*="GroupOutcomes"]'
-    ),
-  ];
-  outcomeGroups.forEach((group) => {
-    if (!group.querySelector('ul')) {
-      group.querySelector('div').click();
-    }
-  });
-  const outcomeGroupLists = [
-    ...document.querySelectorAll(
-      '[class*="FullMatchStyled"] [class*="GroupOutcomes"] ul[class*="List"]'
-    ),
-  ];
-  let outcome = null;
-  const reactKey = Number(worker.BetId.substring(0, worker.BetId.indexOf('_')));
-  // eslint-disable-next-line no-restricted-syntax
-  for (const outcomeGroupList of outcomeGroupLists) {
-    // console.log(outcomeGroupList.previousElementSibling.textContent);
-    outcome = (getReactInstance(
-      outcomeGroupList
-    ) as OutcomeGroupList).memoizedProps.children.find((currentOutcome) => {
-      // console.log(
-      //   `${currentOutcome.props.children.props.name} - ${currentOutcome.props.children.props.id}`
-      // );
-      return currentOutcome.props.children.props.id === reactKey;
-    });
-    if (outcome) {
-      break;
-    }
-  }
+  const outcome = await awaiter(
+    () => {
+      const outcomeGroups = [
+        ...document.querySelectorAll(
+          '[class*="FullMatchStyled"] [class*="GroupOutcomes"]'
+        ),
+      ];
+      outcomeGroups.forEach((group) => {
+        if (!group.querySelector('ul')) {
+          group.querySelector('div').click();
+        }
+      });
+      const outcomeGroupLists = [
+        ...document.querySelectorAll(
+          '[class*="FullMatchStyled"] [class*="GroupOutcomes"] ul[class*="List"]'
+        ),
+      ];
+      let result = null;
+      const reactKey = Number(
+        worker.BetId.substring(0, worker.BetId.indexOf('_'))
+      );
+      // eslint-disable-next-line no-restricted-syntax
+      for (const outcomeGroupList of outcomeGroupLists) {
+        // console.log(outcomeGroupList.previousElementSibling.textContent);
+        result = (getReactInstance(
+          outcomeGroupList
+        ) as OutcomeGroupList).memoizedProps.children.find((currentOutcome) => {
+          // console.log(
+          //   `${currentOutcome.props.children.props.name} - ${currentOutcome.props.children.props.id}`
+          // );
+          return currentOutcome.props.children.props.id === reactKey;
+        });
+        if (result) {
+          return result;
+        }
+      }
+      return null;
+    },
+    5000,
+    100
+  );
+
   if (!outcome) {
     throw new JsFailError('Ставка не найдена');
   }
