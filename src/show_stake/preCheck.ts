@@ -26,17 +26,6 @@ const preCheck = async (): Promise<void> => {
       throw new JsFailError('Вкладка так и не переключилась');
     }
   }
-  if (window.location.pathname !== '/live') {
-    log('Открыт не Live', 'steelblue');
-    const live = document.querySelector('[href="/live"]') as HTMLElement;
-    if (!live) {
-      throw new JsFailError('Не найдена кнопка перехода на Live');
-    }
-    log('Переходим на Live', 'orange');
-    live.click();
-  } else {
-    log('Октрыт Live', 'steelblue');
-  }
 };
 
 export default preCheck;
