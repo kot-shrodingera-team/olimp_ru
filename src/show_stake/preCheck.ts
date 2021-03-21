@@ -3,6 +3,11 @@ import isClone from '../isClone';
 import JsFailError from './errors/jsFailError';
 
 const preCheck = async (): Promise<void> => {
+  if (!('any' in Promise)) {
+    throw new JsFailError(
+      'Ошибка браузера, нет нужных функций. Обратитесь в ТП'
+    );
+  }
   // Клон
   if (isClone()) {
     return;

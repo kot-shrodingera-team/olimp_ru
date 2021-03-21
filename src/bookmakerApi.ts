@@ -34,6 +34,14 @@ declare global {
     value1: string
   ) => unknown;
   const betClear: () => unknown;
+
+  interface Window {
+    germesData: {
+      doStakeTime: Date;
+      betProcessingStep: string;
+      betProcessingAdditionalInfo: string;
+    };
+  }
 }
 
 export default {};

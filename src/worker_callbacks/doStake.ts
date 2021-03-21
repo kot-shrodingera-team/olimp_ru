@@ -3,7 +3,6 @@ import { log } from '@kot-shrodingera-team/germes-utils';
 import getCoefficient from '../stake_info/getCoefficient';
 import { clearDoStakeTime } from '../stake_info/doStakeTime';
 import isClone from '../isClone';
-import { clearNoResultScreenshot } from './checkCouponLoading';
 
 // const preCheck = (): boolean => {
 //   return true;
@@ -32,41 +31,25 @@ const postCheck = (): boolean => {
       }
     }
   }
-  clearNoResultScreenshot();
+  window.germesData.betProcessingStep = 'beforeStart';
   return true;
 };
 
-const doStake = (() => {
-  if (isClone()) {
-    return doStakeGenerator({
-      // preCheck,
-      doStakeButtonSelector: 'button.placeBetButton',
-      getCoefficient,
-      // disabledCheck: false,
-      // errorClasses: [
-      //   {
-      //     className: '',
-      //     message: '',
-      //   },
-      // ],
-      postCheck,
-      clearDoStakeTime,
-    });
-  }
-  return doStakeGenerator({
-    // preCheck,
-    doStakeButtonSelector: '#betslip button[type="submit"]',
-    getCoefficient,
-    disabledCheck: true,
-    // errorClasses: [
-    //   {
-    //     className: '',
-    //     message: '',
-    //   },
-    // ],
-    postCheck,
-    clearDoStakeTime,
-  });
-})();
+const doStake = doStakeGenerator({
+  // preCheck,
+  doStakeButtonSelector: isClone()
+    ? 'button.placeBetButton'
+    : '#betslip button[type="submit"]',
+  getCoefficient,
+  disabledCheck: !isClone(),
+  // errorClasses: [
+  //   {
+  //     className: '',
+  //     message: '',
+  //   },
+  // ],
+  postCheck,
+  clearDoStakeTime,
+});
 
 export default doStake;
