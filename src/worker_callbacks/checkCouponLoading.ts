@@ -104,7 +104,7 @@ const asyncCheck = async () => {
       return error('Изменение коэффициента или исхода');
     }
     if (doneElement) {
-      return error('ставка недоступна');
+      return success('Ставка принята');
     }
 
     return error('Не дождались результата ставки');
