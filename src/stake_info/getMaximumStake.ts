@@ -40,7 +40,7 @@ const getMaximumStake = (() => {
   }
   return getMaximumStakeGenerator({
     maximumStakeElementSelector:
-      '.bet-card-wrap__BetCardWrap-muhxrm-0 .single__InfoMax-f0u43l-0:last-child',
+      '.bet-card-wrap__BetCardWrap-muhxrm-0 .single__InfoMax-f0u43l-0:nth-child(5)',
     maximumStakeRegex: null,
     disableLog: true,
   });
