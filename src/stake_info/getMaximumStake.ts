@@ -8,11 +8,12 @@ import isClone from '../isClone';
 
 export const maximumStakeReady = (() => {
   if (isClone()) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return async (timeout = 5000, interval = 100): Promise<boolean> => true;
   }
   return maximumStakeReadyGenerator({
     maximumStakeElementSelector:
-      '.bet-card-wrap__BetCardWrap-muhxrm-0 .single__InfoMax-f0u43l-0:last-child',
+      '.bet-card-wrap__BetCardWrap-muhxrm-0 .single__InfoMax-f0u43l-0:nth-child(5)',
     // maximumStakeRegex: null,
   });
 })();
