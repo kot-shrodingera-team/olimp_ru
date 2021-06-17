@@ -214,7 +214,7 @@ const check = () => {
 
 const checkCouponLoading = checkCouponLoadingGenerator({
   getDoStakeTime,
-  bookmakerName: isClone() ? 'BetOlimp' : 'Fonbet',
+  bookmakerName: isClone() ? 'BetOlimp' : 'Олимп',
   timeout: 50000,
   check,
 });
