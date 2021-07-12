@@ -4,6 +4,7 @@ import {
   getPhoneCountry,
   log,
 } from '@kot-shrodingera-team/germes-utils';
+import { setReactInputValue } from '@kot-shrodingera-team/germes-utils/reactUtils';
 import isClone from '../isClone';
 import { updateBalance, balanceReady } from '../stake_info/getBalance';
 // import afterSuccesfulLogin from './afterSuccesfulLogin';
@@ -12,6 +13,44 @@ const setLoginType = async (): Promise<boolean> => {
   if (isClone()) {
     return true;
   }
+  const phoneInput = document.querySelector(
+    'input[name="phone"], input[name="login"]'
+  );
+  if (!phoneInput) {
+    log('Не найдено поле ввода телефона', 'crimson');
+    return false;
+  }
+  setReactInputValue(phoneInput, '+79999999999');
+  const submitButton = document.querySelector<HTMLElement>('button.submit');
+  if (!submitButton) {
+    log('Не найдена кнопка входа', 'crimson');
+    return false;
+  }
+  submitButton.click();
+  worker.SetSessionData('OlimpRu.WaitingForSendSMSButton', '1');
+  // enabled
+  // common-button__CommonButton-xn93w0-0 outline__Outline-sc-90fv1c-0 authorization__SendSms-sc-1c1m7vp-5 fAOPex
+  // disabled
+  // common-button__CommonButton-xn93w0-0 outline__Outline-sc-90fv1c-0 authorization__SendSms-sc-1c1m7vp-5 jydxZu
+  const sendSMSEnabledButton = (await getElement(
+    '.authorization__SendSms-sc-1c1m7vp-5.fAOPex',
+    45000
+  )) as HTMLElement;
+  worker.SetSessionData('OlimpRu.WaitingForSendSMSButton', '0');
+  if (!sendSMSEnabledButton) {
+    log('Не дождались появления кнопки отправки смс', 'crimson');
+    return false;
+  }
+  sendSMSEnabledButton.click();
+  // common-button__CommonButton-xn93w0-0 outline__Outline-sc-90fv1c-0 authorization__SendSms-sc-1c1m7vp-5 authorization__OldSignInButton-sc-1c1m7vp-6 cvcnbA
+  const signInViaPasswordButton = document.querySelector<HTMLElement>(
+    '.authorization__OldSignInButton-sc-1c1m7vp-6'
+  );
+  if (!signInViaPasswordButton) {
+    log('Не найдена кнопка входа по паролю', 'crimson');
+    return false;
+  }
+  signInViaPasswordButton.click();
   const phoneLogin = Boolean(getPhoneCountry());
   if (phoneLogin) {
     const phoneTab = (await getElement(

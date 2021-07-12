@@ -12,6 +12,14 @@ const clearGermesData = () => {
 
 const fastLoad = async (): Promise<void> => {
   log(`Быстрая загрузка (${version})`, 'steelblue');
+  if (worker.GetSessionData('OlimpRu.WaitingForSendSMSButton') === '1') {
+    log(
+      'Не закончена авторизация. Ожидается появление кнопки отправки смс',
+      'red'
+    );
+    worker.JSFail();
+    return;
+  }
   clearGermesData();
   showStake();
 };
