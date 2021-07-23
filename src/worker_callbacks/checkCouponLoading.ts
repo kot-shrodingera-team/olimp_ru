@@ -115,12 +115,12 @@ const asyncCheck = async () => {
 
   const checkResult = async (resultMessageElement: Element) => {
     const resultMessage = resultMessageElement.textContent.trim();
-    if (resultMessage === 'Ваша ставка успешно принята!') {
+    if (/Ваша ставка успешно принята!/i.test(resultMessage)) {
       return success('Ставка принята');
     }
     log('Ошибка ставки', 'crimson');
     if (
-      ['Соединение оборвалось. Попробуйте ещё раз', 'Network Error'].includes(
+      /Соединение оборвалось. Попробуйте ещё раз|Network Error/i.test(
         resultMessage
       )
     ) {
