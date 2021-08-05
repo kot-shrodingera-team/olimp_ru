@@ -113,8 +113,8 @@ const authorize = (() => {
   }
   return authorizeGenerator({
     openForm: {
-      selector: 'button.not-autorized-bar__ButtonAsLink-u8i7bt-0',
-      openedSelector: '.form-wrap__FormWrap-sc-1j4hepk-0',
+      selector: 'button[class*="not-autorized-bar__ButtonAsLink-"]',
+      openedSelector: '[class*="form-wrap__FormWrap-"]',
       // afterOpenDelay: 0,
     },
     setLoginType,
