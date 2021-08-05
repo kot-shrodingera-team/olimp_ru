@@ -33,7 +33,7 @@ const setLoginType = async (): Promise<boolean> => {
   // disabled
   // common-button__CommonButton-xn93w0-0 outline__Outline-sc-90fv1c-0 authorization__SendSms-sc-1c1m7vp-5 jydxZu
   const sendSMSEnabledButton = (await getElement(
-    '[class*="authorization__SendSms-"]',
+    '[class*="authorization__SendSms-"]:not([disabled])',
     45000
   )) as HTMLElement;
   worker.SetSessionData('OlimpRu.WaitingForSendSMSButton', '0');
