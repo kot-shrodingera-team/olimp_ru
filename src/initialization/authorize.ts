@@ -33,7 +33,7 @@ const setLoginType = async (): Promise<boolean> => {
   // disabled
   // common-button__CommonButton-xn93w0-0 outline__Outline-sc-90fv1c-0 authorization__SendSms-sc-1c1m7vp-5 jydxZu
   const sendSMSEnabledButton = (await getElement(
-    '.authorization__SendSms-sc-1c1m7vp-5.fAOPex',
+    '[class*="authorization__SendSms-"]',
     45000
   )) as HTMLElement;
   worker.SetSessionData('OlimpRu.WaitingForSendSMSButton', '0');
@@ -44,7 +44,7 @@ const setLoginType = async (): Promise<boolean> => {
   sendSMSEnabledButton.click();
   // common-button__CommonButton-xn93w0-0 outline__Outline-sc-90fv1c-0 authorization__SendSms-sc-1c1m7vp-5 authorization__OldSignInButton-sc-1c1m7vp-6 cvcnbA
   const signInViaPasswordButton = document.querySelector<HTMLElement>(
-    '.authorization__OldSignInButton-sc-1c1m7vp-6'
+    '[class*="authorization__OldSignInButton-"]'
   );
   if (!signInViaPasswordButton) {
     log('Не найдена кнопка входа по паролю', 'crimson');
@@ -54,7 +54,7 @@ const setLoginType = async (): Promise<boolean> => {
   const phoneLogin = Boolean(getPhoneCountry());
   if (phoneLogin) {
     const phoneTab = (await getElement(
-      'form .common-tab__CommonTab-sc-1w94sug-0:nth-child(1)',
+      'form [class*="common-tab__CommonTab-"]:nth-child(1)',
       2000
     )) as HTMLElement;
     if (!phoneTab) {
@@ -71,7 +71,7 @@ const setLoginType = async (): Promise<boolean> => {
     return true;
   }
   const loginTab = (await getElement(
-    'form .common-tab__CommonTab-sc-1w94sug-0:nth-child(2)',
+    'form [class*="common-tab__CommonTab-"]:nth-child(2)',
     2000
   )) as HTMLElement;
   if (!loginTab) {
