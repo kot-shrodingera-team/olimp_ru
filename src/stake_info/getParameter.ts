@@ -20,7 +20,7 @@ const getParameter = (): number => {
     return parameter;
   }
   const betOutcomeName = document.querySelector(
-    '[class^="bet-card__OutcomeName-mhg7ic"]'
+    '[class*="bet-card__OutcomeName-"]'
   );
   if (!betOutcomeName) {
     log('Не найден параметр (не найдена роспись ставки)', 'crimson');

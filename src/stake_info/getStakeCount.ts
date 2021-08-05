@@ -8,7 +8,7 @@ const getStakeCount = (() => {
     });
   }
   return getStakeCountGenerator({
-    stakeElementSelector: '.bet-card-wrap__BetCardWrap-muhxrm-0',
+    stakeElementSelector: '[class*="bet-card-wrap__BetCardWrap-"]',
   });
 })();
 

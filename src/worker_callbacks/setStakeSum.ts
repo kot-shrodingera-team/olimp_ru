@@ -18,7 +18,7 @@ const setStakeSum = (() => {
   }
   return setStakeSumGenerator({
     sumInputSelector:
-      '.bet-card-wrap__BetCardWrap-muhxrm-0 input.number-light__Input-sc-1kxvi0w-1',
+      '[class*="bet-card-wrap__BetCardWrap-"] input.number-light__Input-sc-1kxvi0w-1',
     alreadySetCheck: {
       falseOnSumChange: false,
     },

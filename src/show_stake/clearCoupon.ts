@@ -26,7 +26,7 @@ const clearCoupon = (() => {
     getStakeCount,
     // apiClear,
     clearSingleSelector: '',
-    clearAllSelector: '.betslip-body__ClearAll-czlbcb-4',
+    clearAllSelector: '[class*="betslip-body__ClearAll-"]',
     clearMode: 'all-only',
     // maxUnload: {
     //   getMaximumStake,

@@ -11,7 +11,7 @@ const getCurrentSum = (() => {
   }
   return getCurrentSumGenerator({
     sumInput:
-      '.bet-card-wrap__BetCardWrap-muhxrm-0 input.number-light__Input-sc-1kxvi0w-1',
+      '[class*="bet-card-wrap__BetCardWrap-"] input.number-light__Input-sc-1kxvi0w-1',
     // zeroValues: [],
     // currentSumRegex: null,
   });
