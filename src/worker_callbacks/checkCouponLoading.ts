@@ -119,8 +119,9 @@ const asyncCheck = async () => {
       return success('Ставка принята');
     }
     log('Ошибка ставки', 'crimson');
+    log(resultMessage, 'tomato');
     if (
-      /Соединение оборвалось. Попробуйте ещё раз|Network Error/i.test(
+      /Соединение оборвалось. Попробуйте ещ[её] раз|Network Error/i.test(
         resultMessage
       )
     ) {
@@ -129,8 +130,9 @@ const asyncCheck = async () => {
         `Ставка засчитана как НЕ принятая. Желательно проверить вручную\n` +
         `${stakeInfoString()}\n`;
       worker.Helper.SendInformedMessage(message);
+      window.location.reload();
+      return error();
     }
-    log(resultMessage, 'tomato');
     log('Ждём появления карточки ставки', 'steelblue');
     window.germesData.betProcessingStep = 'waitingForBetCard';
     const betCard = await getElement(betCardSelector, 20000);
