@@ -1,119 +1,113 @@
-import { awaiter, getElement, log } from '@kot-shrodingera-team/germes-utils';
-import { getReactInstance } from '@kot-shrodingera-team/germes-utils/reactUtils';
-import { OutcomeGroupList } from '../bookmakerApi';
-import isClone from '../isClone';
+import {
+  awaiter,
+  log,
+  repeatingOpenBet,
+  text,
+} from '@kot-shrodingera-team/germes-utils';
+import { JsFailError } from '@kot-shrodingera-team/germes-utils/errors';
+import findBet from '../helpers/findBet';
+import isClone from '../helpers/isClone';
 import getMaximumStake, {
   maximumStakeReady,
 } from '../stake_info/getMaximumStake';
 import getStakeCount from '../stake_info/getStakeCount';
-import JsFailError from './errors/jsFailError';
+import clearCoupon from './clearCoupon';
 
-const openBet = async (): Promise<boolean> => {
-  // Клон
-  if (isClone()) {
-    const betId = worker.BetId.split('_')[0];
-    const [cloneId, cloneSid] = [
-      betId.substring(0, betId.length - 1),
-      betId.substring(betId.length - 1),
-    ];
-    const betData = worker.BetId.split('_')[1].split(':');
-    const parameter = betData[3];
-    log(`betAdd(${cloneId}, ${cloneSid}, 'lv', '1', ${parameter})`, 'orange');
-    const maxTryCount = 5;
-    for (let i = 1; i <= maxTryCount; i += 1) {
-      betAdd(cloneId, cloneSid, 'lv', '1', parameter);
-      // eslint-disable-next-line no-await-in-loop
-      const betAdded = await awaiter(() => getStakeCount() === 1, 1000, 50);
+const openBet = async (): Promise<void> => {
+  /* ======================================================================== */
+  /*                              Очистка купона                              */
+  /* ======================================================================== */
 
-      if (!betAdded) {
-        if (i === maxTryCount) {
-          throw new JsFailError('Ставка так и не попала в купон');
-        }
-        log(`Ставка не попала в купон (попытка ${i})`, 'steelblue');
-      } else {
-        log('Ставка попала в купон', 'steelblue');
-        break;
-      }
-    }
-    // log('Ставка найдена', 'steelblue');
-    return;
+  const couponCleared = await clearCoupon();
+  if (!couponCleared) {
+    throw new JsFailError('Не удалось очистить купон');
   }
-  // ЦУПИС
-  log(`Ищем ставку "${worker.BetName}"`, 'steelblue');
-  await getElement('[class*="FullMatchStyled"] [class*="GroupOutcomes"]');
+
+  /* ======================================================================== */
+  /*                      Формирование данных для поиска                      */
+  /* ======================================================================== */
+
+  const cloneBetId = isClone() ? worker.BetId.split('_')[0] : undefined;
+  const cloneId = isClone()
+    ? cloneBetId.substring(0, cloneBetId.length - 1)
+    : undefined;
+  const cloneSid = isClone()
+    ? cloneBetId.substring(cloneBetId.length - 1)
+    : undefined;
+  const cloneBetData = isClone()
+    ? worker.BetId.split('_')[1].split(':')
+    : undefined;
+  const cloneParameter = isClone() ? cloneBetData[3] : undefined;
   const reactKey = Number(worker.BetId.substring(0, worker.BetId.indexOf('_')));
 
-  const outcome = await awaiter(
-    () => {
-      const outcomeGroups = [
-        ...document.querySelectorAll(
-          '[class*="FullMatchStyled"] [class*="GroupOutcomes"]'
-        ),
-      ];
+  /* ======================================================================== */
+  /*                               Поиск ставки                               */
+  /* ======================================================================== */
 
-      // eslint-disable-next-line no-restricted-syntax
-      for (const outcomeGroup of outcomeGroups) {
-        if (!outcomeGroup.querySelector('ul')) {
-          outcomeGroup.querySelector('div').click();
-        }
-        const outcomeGroupLists = [
-          ...outcomeGroup.querySelectorAll('ul[class*="List"]'),
-        ];
-
-        // eslint-disable-next-line no-restricted-syntax
-        for (const outcomeGroupList of outcomeGroupLists) {
-          // console.log(outcomeGroupList.previousElementSibling.textContent);
-          const result = (getReactInstance(
-            outcomeGroupList
-          ) as OutcomeGroupList).memoizedProps.children.find(
-            (currentOutcome) => {
-              // console.log(
-              //   `${currentOutcome.props.children.props.name} - ${currentOutcome.props.children.props.id}`
-              // );
-              return currentOutcome.props.children.props.id === reactKey;
-            }
-          );
-          if (result) {
-            return result;
-          }
-        }
-      }
-      return null;
-    },
-    5000,
-    100
-  );
-
-  if (!outcome) {
+  const bet = isClone() ? undefined : await findBet(reactKey);
+  if (!isClone() && !bet) {
     throw new JsFailError('Ставка не найдена');
   }
-  log('Ставка найдена', 'steelblue');
 
-  const maxTryCount = 5;
-  for (let i = 1; i <= maxTryCount; i += 1) {
-    outcome.props.children.props.onClick();
-    // eslint-disable-next-line no-await-in-loop
-    const betAdded = await awaiter(() => getStakeCount() === 1, 200, 50);
+  /* ======================================================================== */
+  /*           Открытие ставки, проверка, что ставка попала в купон           */
+  /* ======================================================================== */
 
-    if (!betAdded) {
-      if (i === maxTryCount) {
-        throw new JsFailError('Ставка так и не попала в купон');
-      }
-      log(`Ставка не попала в купон (попытка ${i})`, 'steelblue');
+  const openingAction = async () => {
+    if (isClone()) {
+      window.betAdd(cloneId, cloneSid, 'lv', '1', cloneParameter);
     } else {
-      log('Ставка попала в купон', 'steelblue');
-      break;
+      bet.props.children.props.onClick();
+    }
+  };
+  await repeatingOpenBet(openingAction, getStakeCount, 5, 1000, 50);
+
+  /* ======================================================================== */
+  /*                  Ожидание появления максимальной ставки                  */
+  /* ======================================================================== */
+
+  if (isClone()) {
+    //
+  } else {
+    await maximumStakeReady();
+    if (
+      !(await awaiter(
+        () => getMaximumStake() !== 9007199254740991 && getMaximumStake() !== 0,
+        2000
+      ))
+    ) {
+      throw new JsFailError(' Максимальная ставка не появилась');
     }
   }
-  await maximumStakeReady();
-  if (
-    !(await awaiter(
-      () => getMaximumStake() !== 9007199254740991 && getMaximumStake() !== 0,
-      2000
-    ))
-  ) {
-    throw new JsFailError(' Максимальная ставка не появилась');
+
+  /* ======================================================================== */
+  /*                    Вывод информации об открытой ставке                   */
+  /* ======================================================================== */
+
+  const eventNameSelector = '[class*="bet-card__MatchName-"]';
+  // const marketNameSelector = '';
+  const betNameSelector = '[class*="bet-card__OutcomeName-"]';
+
+  const eventNameElement = document.querySelector(eventNameSelector);
+  // const marketNameElement = document.querySelector(marketNameSelector);
+  const betNameElement = document.querySelector(betNameSelector);
+
+  if (!eventNameElement) {
+    throw new JsFailError('Не найдено событие открытой ставки');
   }
+  // if (!marketNameElement) {
+  //   throw new JsFailError('Не найден маркет открытой ставки');
+  // }
+  if (!betNameElement) {
+    throw new JsFailError('Не найдена роспись открытой ставки');
+  }
+
+  const eventName = text(eventNameElement);
+  // const marketName = text(marketNameElement);
+  const betName = text(betNameElement);
+
+  // log(`Открыта ставка\n${eventName}\n${marketName}\n${betName}`, 'steelblue');
+  log(`Открыта ставка\n${eventName}\n${betName}`, 'steelblue');
 };
 
 export default openBet;

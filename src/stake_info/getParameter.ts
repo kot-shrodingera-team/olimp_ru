@@ -1,40 +1,54 @@
-import { log } from '@kot-shrodingera-team/germes-utils';
-import isClone from '../isClone';
+import {
+  getWorkerParameter,
+  log,
+  text,
+} from '@kot-shrodingera-team/germes-utils';
+import isClone from '../helpers/isClone';
 
 const getParameter = (): number => {
-  if (isClone()) {
-    const betNameElement = document.querySelector('.name .fll');
-    if (!betNameElement) {
-      log('Не найден параметр (не найдена роспись)');
-      return -9999;
-    }
-    const betName = betNameElement.textContent.trim();
-    const parameterRegex = /\(([+-]?\d+(?:\.\d+)?)\)/;
-    const parameterMatch = betName.match(parameterRegex);
-    if (!parameterMatch) {
-      log('Ставка без параметра', 'steelblue');
+  if (
+    getWorkerParameter('fakeParameter') ||
+    getWorkerParameter('fakeOpenStake')
+  ) {
+    const parameter = Number(JSON.parse(worker.ForkObj).param);
+    if (Number.isNaN(parameter)) {
       return -6666;
     }
-    const parameter = Number(parameterMatch[1]);
-    log(`Параметр: ${parameter}`, 'steelblue');
     return parameter;
   }
-  const betOutcomeName = document.querySelector(
-    '[class*="bet-card__OutcomeName-"]'
-  );
-  if (!betOutcomeName) {
-    log('Не найден параметр (не найдена роспись ставки)', 'crimson');
+
+  // const marketNameSelector = '';
+  const betNameSelector = isClone()
+    ? '.name .fll'
+    : '[class*="bet-card__OutcomeName-"]';
+
+  // const marketNameElement = document.querySelector(marketNameSelector);
+  const betNameElement = document.querySelector(betNameSelector);
+
+  // if (!marketNameElement) {
+  //   log('Не найден маркет ставки', 'crimson');
+  //   return -9999;
+  // }
+  if (!betNameElement) {
+    log('Не найдена роспись ставки', 'crimson');
     return -9999;
   }
-  const parameterRegex = /^.*\(([+-]?\d+(?:\.\d+)?)\)(?: бол| мен)?$/;
-  const match = betOutcomeName.textContent.match(parameterRegex);
-  if (!match) {
-    log('Ставка без параметра', 'steelblue');
-    return -6666;
+
+  // const marketName = text(marketNameElement);
+  const betName = text(betNameElement);
+
+  // if (marketName === 'Draw No Bet') {
+  //   return 0;
+  // }
+
+  const parameterRegex = isClone()
+    ? /\(([+-]?\d+(?:\.\d+)?)\)/
+    : /^.*\(([+-]?\d+(?:\.\d+)?)\)(?: бол| мен)?$/;
+  const parameterMatch = betName.match(parameterRegex);
+  if (parameterMatch) {
+    return Number(parameterMatch[1]);
   }
-  const parameter = Number(match[1]);
-  log(`Параметр: ${parameter}`, 'steelblue');
-  return parameter;
+  return -6666;
 };
 
 export default getParameter;

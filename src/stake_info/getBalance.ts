@@ -1,36 +1,44 @@
-import {
-  balanceReadyGenerator,
-  getBalanceGenerator,
-} from '@kot-shrodingera-team/germes-generators/stake_info/getBalance';
-import isClone from '../isClone';
+import getStakeInfoValueGenerator, {
+  stakeInfoValueReadyGenerator,
+} from '@kot-shrodingera-team/germes-generators/stake_info/getStakeInfoValue';
+import { StakeInfoValueOptions } from '@kot-shrodingera-team/germes-generators/stake_info/types';
+import isClone from '../helpers/isClone';
 
-export const balanceReady = (() => {
-  if (isClone()) {
-    return balanceReadyGenerator({
-      balanceSelector: '.js-showbalance',
-      balanceRegex: null,
-    });
-  }
-  return balanceReadyGenerator({
-    balanceSelector: '.user-bars__Balance-sc-18yu4ah-5 span.text',
-    // balanceRegex: null,
-  });
-})();
+export const balanceSelector = isClone()
+  ? '.js-showbalance'
+  : '[class*="user-bars__Balance-"]';
 
-const getBalance = (() => {
-  if (isClone()) {
-    return getBalanceGenerator({
-      balanceSelector: '.js-showbalance',
-      // balanceRegex: null,
-    });
-  }
-  return getBalanceGenerator({
-    balanceSelector: '.user-bars__Balance-sc-18yu4ah-5 span.text',
-    // balanceRegex: null,
-  });
-})();
+const balanceOptions: StakeInfoValueOptions = {
+  name: 'balance',
+  // fixedValue: () => 0,
+  valueFromText: {
+    text: {
+      // getText: () => '',
+      selector: balanceSelector,
+      // context: () => document,
+    },
+    // replaceDataArray: [
+    //   {
+    //     searchValue: '',
+    //     replaceValue: '',
+    //   },
+    // ],
+    // removeRegex: /[\s,']/g,
+    // matchRegex: /(\d+(?:\.\d+)?)/,
+    errorValue: 0,
+  },
+  // zeroValues: [],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // modifyValue: (value: number, extractType: string) => value,
+  // disableLog: false,
+};
+
+const getBalance = getStakeInfoValueGenerator(balanceOptions);
+
+export const balanceReady = stakeInfoValueReadyGenerator(balanceOptions);
 
 export const updateBalance = (): void => {
+  worker.StakeInfo.Balance = getBalance();
   worker.JSBalanceChange(getBalance());
 };
 

@@ -1,15 +1,11 @@
 import getStakeCountGenerator from '@kot-shrodingera-team/germes-generators/stake_info/getStakeCount';
-import isClone from '../isClone';
+import isClone from '../helpers/isClone';
 
-const getStakeCount = (() => {
-  if (isClone()) {
-    return getStakeCountGenerator({
-      stakeElementSelector: '.singles .item',
-    });
-  }
-  return getStakeCountGenerator({
-    stakeElementSelector: '[class*="bet-card-wrap__BetCardWrap-"]',
-  });
-})();
+const getStakeCount = getStakeCountGenerator({
+  stakeSelector: isClone()
+    ? '.singles .item'
+    : '[class*="bet-card-wrap__BetCardWrap-"]',
+  // context: () => document,
+});
 
 export default getStakeCount;

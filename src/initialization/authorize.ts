@@ -1,15 +1,17 @@
 import authorizeGenerator from '@kot-shrodingera-team/germes-generators/initialization/authorize';
 import {
   getElement,
-  getPhoneCountry,
+  getPhoneLoginData,
   log,
+  // resolveRecaptcha,
 } from '@kot-shrodingera-team/germes-utils';
 import { setReactInputValue } from '@kot-shrodingera-team/germes-utils/reactUtils';
-import isClone from '../isClone';
+import { authElementSelector } from '../stake_info/checkAuth';
+import isClone from '../helpers/isClone';
 import { updateBalance, balanceReady } from '../stake_info/getBalance';
 // import afterSuccesfulLogin from './afterSuccesfulLogin';
 
-const setLoginType = async (): Promise<boolean> => {
+const preInputCheck = async (): Promise<boolean> => {
   if (isClone()) {
     return true;
   }
@@ -51,7 +53,7 @@ const setLoginType = async (): Promise<boolean> => {
     return false;
   }
   signInViaPasswordButton.click();
-  const phoneLogin = Boolean(getPhoneCountry());
+  const phoneLogin = Boolean(getPhoneLoginData());
   if (phoneLogin) {
     const phoneTab = (await getElement(
       'form [class*="common-tab__CommonTab-"]:nth-child(1)',
@@ -70,10 +72,10 @@ const setLoginType = async (): Promise<boolean> => {
     }
     return true;
   }
-  const loginTab = (await getElement(
+  const loginTab = await getElement<HTMLElement>(
     'form [class*="common-tab__CommonTab-"]:nth-child(2)',
     2000
-  )) as HTMLElement;
+  );
   if (!loginTab) {
     log('Ошибка: Не найдена кнопка переключения на вход по логину', 'crimson');
     return false;
@@ -88,49 +90,57 @@ const setLoginType = async (): Promise<boolean> => {
   return true;
 };
 
-const authorize = (() => {
-  if (isClone()) {
-    return authorizeGenerator({
-      // openForm: {
-      // selector: '',
-      // openedSelector: '',
-      // afterOpenDelay: 0,
-      // },
-      // setLoginType,
-      loginInputSelector: 'input#login-username',
-      passwordInputSelector: 'input#login-password',
-      submitButtonSelector: 'button#login_btn',
-      inputType: 'fireEvent',
-      beforeSubmitDelay: 1000, // Без задержки не проходит логин
-      // captchaSelector: '',
-      // loginedWait: {
-      //   loginedSelector: '',
-      //   balanceReady,
-      //   updateBalance,
-      // },
-      // afterSuccesfulLogin,
-    });
-  }
-  return authorizeGenerator({
-    openForm: {
-      selector: 'button[class*="not-autorized-bar__ButtonAsLink-"]',
-      openedSelector: '[class*="form-wrap__FormWrap-"]',
-      // afterOpenDelay: 0,
-    },
-    setLoginType,
-    loginInputSelector: 'input[name="phone"], input[name="login"]',
-    passwordInputSelector: 'input[name="password"]',
-    submitButtonSelector: 'button.submit',
-    inputType: 'react',
-    // beforeSubmitDelay: 0,
-    // captchaSelector: '',
-    loginedWait: {
-      loginedSelector: 'span[title="Личный кабинет"]',
-      balanceReady,
-      updateBalance,
-    },
-    // afterSuccesfulLogin,
-  });
-})();
+// const beforeSubmitCheck = async (): Promise<boolean> => {
+//   // const recaptchaIFrame = await getElement('iframe[title="reCAPTCHA"]', 1000);
+//   // if (recaptchaIFrame) {
+//   //   log('Есть капча. Пытаемся решить', 'orange');
+//   //   try {
+//   //     await resolveRecaptcha();
+//   //   } catch (e) {
+//   //     if (e instanceof Error) {
+//   //       log(e.message, 'red');
+//   //     }
+//   //     return false;
+//   //   }
+//   // } else {
+//   //   log('Нет капчи', 'steelblue');
+//   // }
+//   return true;
+// };
+
+const authorize = authorizeGenerator({
+  openForm: isClone()
+    ? undefined
+    : {
+        selector: 'button[class*="not-autorized-bar__ButtonAsLink-"]',
+        openedSelector: '[class*="form-wrap__FormWrap-"]',
+        // loopCount: 10,
+        // triesInterval: 1000,
+        // afterOpenDelay: 0,
+      },
+  preInputCheck,
+  loginInputSelector: isClone()
+    ? 'input#login-username'
+    : 'input[name="phone"], input[name="login"]',
+  passwordInputSelector: isClone()
+    ? 'input#login-password'
+    : 'input[name="password"]',
+  submitButtonSelector: isClone() ? 'button#login_btn' : 'button.submit',
+  inputType: isClone() ? 'fireEvent' : 'react',
+  fireEventNames: ['input'],
+  beforeSubmitDelay: isClone() ? 1000 : 0,
+  // beforeSubmitCheck,
+  // captchaSelector: '',
+  loginedWait: isClone()
+    ? undefined
+    : {
+        loginedSelector: authElementSelector,
+        timeout: 5000,
+        balanceReady,
+        updateBalance,
+        // afterSuccesfulLogin,
+      },
+  // context: () => document,
+});
 
 export default authorize;

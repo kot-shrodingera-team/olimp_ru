@@ -1,22 +1,26 @@
+import isClone from './helpers/isClone';
+
 export interface OlimpCloneBet {
   deleted: boolean;
   value: number;
   vmaxbet: string;
 }
 
-export interface OutcomeGroupList {
-  memoizedProps: {
+export interface OutcomeGroup {
+  props: {
     children: {
       props: {
-        children: {
-          props: {
-            id: number;
-            name: string;
-            onClick: () => void;
-          };
-        };
+        id: number;
+        name: string;
+        onClick: () => void;
       };
-    }[];
+    };
+  };
+}
+
+export interface OutcomeGroupList {
+  memoizedProps: {
+    children: OutcomeGroup[];
   };
 }
 
@@ -25,23 +29,45 @@ interface OlimpBetslip {
 }
 
 declare global {
-  const betslip: OlimpBetslip;
-  const betAdd: (
-    id: string,
-    sid: string,
-    mtype: string,
-    value: string,
-    value1: string
-  ) => unknown;
-  const betClear: () => unknown;
-
+  // interface GermesData {}
   interface Window {
-    germesData: {
-      doStakeTime: Date;
-      betProcessingStep: string;
-      betProcessingAdditionalInfo: string;
-    };
+    betslip: OlimpBetslip;
+    betAdd: (
+      id: string,
+      sid: string,
+      mtype: string,
+      value: string,
+      value1: string
+    ) => unknown;
+    betClear: () => unknown;
   }
 }
+
+export const clearGermesData = (): void => {
+  if (window.germesData && window.germesData.updateMaximumIntervalId) {
+    clearInterval(window.germesData.updateMaximumIntervalId);
+  }
+  if (window.germesData && window.germesData.updateCoefIntervalId) {
+    clearInterval(window.germesData.updateCoefIntervalId);
+  }
+  window.germesData = {
+    bookmakerName: isClone() ? 'BetOlimp' : 'Olimp.Bet',
+    minimumStake: undefined,
+    maximumStake: undefined,
+    doStakeTime: undefined,
+    betProcessingStep: undefined,
+    betProcessingAdditionalInfo: undefined,
+    betProcessingTimeout: 50000,
+    stakeDisabled: undefined,
+    stopBetProcessing: () => {
+      window.germesData.betProcessingStep = 'error';
+      window.germesData.stakeDisabled = true;
+    },
+    updateMaximumIntervalId: undefined,
+    updateCoefIntervalId: undefined,
+    manualMax: undefined,
+    manualCoef: undefined,
+  };
+};
 
 export default {};

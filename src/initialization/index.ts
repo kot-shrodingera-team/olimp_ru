@@ -6,12 +6,12 @@ import authorize from './authorize';
 
 const initialize = initializeGenerator({
   authStateReady,
+  authStateReadyTimeout: 5000,
   checkAuth,
   balanceReady,
   updateBalance,
   authorize,
   // afterSuccesfulLogin,
-  // authStateReadyTimeout: 0,
 });
 
 export default initialize;

@@ -1,11 +1,10 @@
 import { getElement, log } from '@kot-shrodingera-team/germes-utils';
-import isClone from '../isClone';
-import JsFailError from './errors/jsFailError';
+import { JsFailError } from '@kot-shrodingera-team/germes-utils/errors';
+import isClone from '../helpers/isClone';
 
 const openEvent = async (): Promise<void> => {
   // Клон
   if (isClone()) {
-    // eslint-disable-next-line no-useless-return
     return;
   }
   // ЦУПИС
@@ -13,16 +12,16 @@ const openEvent = async (): Promise<void> => {
     log('Уже открыто нужное событие', 'steelblue');
     return;
   }
-  const live = document.querySelector('[href="/live"]') as HTMLElement;
+  const live = document.querySelector<HTMLElement>('[href="/live"]');
   if (!live) {
     throw new JsFailError('Не найдена кнопка перехода на Live');
   }
   log('Переходим на Live', 'orange');
   live.click();
   log('Ищем событие', 'steelblue');
-  const event = (await getElement(
+  const event = await getElement<HTMLElement>(
     `.default__Link-sc-14zuwl2-0[href*="${worker.EventId}"]`
-  )) as HTMLElement;
+  );
   if (!event) {
     throw new JsFailError('Событие не найдено');
   }

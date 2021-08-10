@@ -1,30 +1,31 @@
-import setStakeSumGenerator from '@kot-shrodingera-team/germes-generators/worker_callbacks/setStakeSum';
-import isClone from '../isClone';
+import setStakeSumGenerator, {
+  clearStakeSumGenerator,
+} from '@kot-shrodingera-team/germes-generators/worker_callbacks/setStakeSum';
+import getCurrentSum, { sumInputSelector } from '../stake_info/getCurrentSum';
+import isClone from '../helpers/isClone';
 
-// const preInputCheck = (): boolean => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// const preInputCheck = (sum: number): boolean => {
 //   return true;
 // };
 
-const setStakeSum = (() => {
-  if (isClone()) {
-    return setStakeSumGenerator({
-      sumInputSelector: 'input.stakeInput',
-      alreadySetCheck: {
-        falseOnSumChange: false,
-      },
-      inputType: 'fireEvent',
-      // preInputCheck,
-    });
-  }
-  return setStakeSumGenerator({
-    sumInputSelector:
-      '[class*="bet-card-wrap__BetCardWrap-"] input.number-light__Input-sc-1kxvi0w-1',
-    alreadySetCheck: {
-      falseOnSumChange: false,
-    },
-    inputType: 'react',
-    // preInputCheck,
-  });
-})();
+const setStakeSumOptions = {
+  sumInputSelector,
+  alreadySetCheck: {
+    getCurrentSum,
+    falseOnSumChange: false,
+  },
+  // preInputCheck,
+  inputType: (isClone() ? 'fireEvent' : 'react') as
+    | 'fireEvent'
+    | 'react'
+    | 'nativeInput',
+  // fireEventNames: ['input'],
+  // context: () => document,
+};
+
+const setStakeSum = setStakeSumGenerator(setStakeSumOptions);
+
+export const clearStakeSum = clearStakeSumGenerator(setStakeSumOptions);
 
 export default setStakeSum;
