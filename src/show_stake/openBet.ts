@@ -67,16 +67,37 @@ const openBet = async (): Promise<void> => {
   /* ======================================================================== */
 
   if (isClone()) {
-    //
+    // noop
   } else {
-    await maximumStakeReady();
-    if (
-      !(await awaiter(
-        () => getMaximumStake() !== 9007199254740991 && getMaximumStake() !== 0,
-        2000
-      ))
-    ) {
-      throw new JsFailError(' Максимальная ставка не появилась');
+    const maxLoaded = await maximumStakeReady();
+    if (!maxLoaded) {
+      throw new JsFailError('Максимальная ставка не появилась');
+    }
+    await awaiter(() => {
+      if (getStakeCount() !== 1) {
+        return true;
+      }
+      if (getMaximumStake() !== 9007199254740991) {
+        return true;
+      }
+      return false;
+    });
+    const stakeCount = getStakeCount();
+    if (stakeCount !== 1) {
+      const resultMessageElement = document.querySelector('');
+      if (resultMessageElement) {
+        const resultMessage = text(resultMessageElement).replace(
+          /^([a-zA-Z]*Icon)/,
+          '$&\n'
+        );
+        if (/Выбранный Вами исход недоступен/i.test(resultMessage)) {
+          throw new JsFailError('Исход недоступен');
+        }
+      }
+      throw new JsFailError(`В ставке не 1 купон (${stakeCount})`);
+    }
+    if (getMaximumStake() === 9007199254740991) {
+      throw new JsFailError('Максимальная ставка не поменялась');
     }
   }
 
