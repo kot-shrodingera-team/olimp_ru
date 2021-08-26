@@ -84,7 +84,9 @@ const openBet = async (): Promise<void> => {
     });
     const stakeCount = getStakeCount();
     if (stakeCount !== 1) {
-      const resultMessageElement = document.querySelector('');
+      const resultMessageElement = document.querySelector(
+        '[class*="results__ResultsMessage-"]'
+      );
       if (resultMessageElement) {
         const resultMessage = text(resultMessageElement).replace(
           /^([a-zA-Z]*Icon)/,
