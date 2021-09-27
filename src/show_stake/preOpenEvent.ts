@@ -12,6 +12,7 @@ import getSiteCurrency from '../helpers/getSiteCurrency';
 import isClone from '../helpers/isClone';
 import checkAuth, { authStateReady } from '../stake_info/checkAuth';
 import { balanceReady, updateBalance } from '../stake_info/getBalance';
+import clearCoupon from './clearCoupon';
 
 const preOpenEvent = async (): Promise<void> => {
   if (!checkBookerHost()) {
@@ -50,6 +51,15 @@ const preOpenEvent = async (): Promise<void> => {
     if (!couponTabActive) {
       throw new JsFailError('Вкладка так и не переключилась');
     }
+  }
+
+  /* ======================================================================== */
+  /*              Очистка купона перед переходом на новое событие             */
+  /* ======================================================================== */
+
+  const couponCleared = await clearCoupon();
+  if (!couponCleared) {
+    throw new JsFailError('Не удалось очистить купон');
   }
 };
 
