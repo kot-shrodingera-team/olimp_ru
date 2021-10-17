@@ -22,7 +22,12 @@ const preInputCheck = async (): Promise<boolean> => {
     log('Не найдено поле ввода телефона', 'crimson');
     return false;
   }
-  setReactInputValue(phoneInput, '+79999999999');
+  const phoneData = getPhoneLoginData();
+  if (phoneData) {
+    setReactInputValue(phoneInput, `+7${phoneData.nsn}`);
+  } else {
+    setReactInputValue(phoneInput, `+79996857230`);
+  }
   const submitButton = document.querySelector<HTMLElement>('button.submit');
   if (!submitButton) {
     log('Не найдена кнопка входа', 'crimson');
@@ -36,7 +41,7 @@ const preInputCheck = async (): Promise<boolean> => {
   // common-button__CommonButton-xn93w0-0 outline__Outline-sc-90fv1c-0 authorization__SendSms-sc-1c1m7vp-5 jydxZu
   const sendSMSEnabledButton = (await getElement(
     '[class*="authorization__SendSms-"]:not([disabled])',
-    45000
+    90000
   )) as HTMLElement;
   worker.SetSessionData('OlimpRu.WaitingForSendSMSButton', '0');
   if (!sendSMSEnabledButton) {
