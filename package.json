@@ -1,6 +1,6 @@
 {
   "name": "@kot-shrodingera-team/olimp_ru",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "dependencies": {
     "@kot-shrodingera-team/germes-generators": "1.1.17",
     "@kot-shrodingera-team/germes-utils": "1.0.66",
