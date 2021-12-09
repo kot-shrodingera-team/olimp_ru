@@ -11,6 +11,7 @@ import {
 } from '@kot-shrodingera-team/germes-utils';
 import { StateMachine } from '@kot-shrodingera-team/germes-utils/stateMachine';
 import isClone from '../helpers/isClone';
+import openBet from '../show_stake/openBet';
 
 const loaderSelector = isClone()
   ? '.loading-bet:not([style="display: none;"])'
@@ -160,6 +161,12 @@ const asyncCheck = async () => {
           log('Карточка ставки не появилась', 'steelblue');
         } else {
           log('Появилась карточка ставки', 'steelblue');
+        }
+        try {
+          await openBet();
+          log('Переоткрыли ставку', 'steelblue');
+        } catch (e) {
+          log(e.message, 'crimson');
         }
         checkCouponLoadingError({});
         machine.end = true;
