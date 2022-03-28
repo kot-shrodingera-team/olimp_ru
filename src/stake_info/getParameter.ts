@@ -20,7 +20,7 @@ const getParameter = (): number => {
   // const marketNameSelector = '';
   const betNameSelector = isClone()
     ? '.name .fll'
-    : '[class*="bet-card__OutcomeName-"]';
+    : '[class*="bet-card__OutcomeName-"], .sticky-column:last-child > :nth-child(1) > :nth-child(1) .align-baseline ~ span';
 
   // const marketNameElement = document.querySelector(marketNameSelector);
   const betNameElement = document.querySelector(betNameSelector);

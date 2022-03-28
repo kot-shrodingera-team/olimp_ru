@@ -7,9 +7,7 @@ import {
 import { JsFailError } from '@kot-shrodingera-team/germes-utils/errors';
 import findBet from '../helpers/findBet';
 import isClone from '../helpers/isClone';
-import getMaximumStake, {
-  maximumStakeReady,
-} from '../stake_info/getMaximumStake';
+import getMaximumStake from '../stake_info/getMaximumStake';
 import getStakeCount from '../stake_info/getStakeCount';
 import clearCoupon from './clearCoupon';
 
@@ -57,7 +55,7 @@ const openBet = async (): Promise<void> => {
     if (isClone()) {
       window.betAdd(cloneId, cloneSid, 'lv', '1', cloneParameter);
     } else {
-      bet.props.children.props.onClick();
+      bet.click();
     }
   };
   await repeatingOpenBet(openingAction, getStakeCount, 5, 1000, 50);
@@ -69,47 +67,72 @@ const openBet = async (): Promise<void> => {
   if (isClone()) {
     // noop
   } else {
-    const maxLoaded = await maximumStakeReady();
-    if (!maxLoaded) {
-      throw new JsFailError('Максимальная ставка не появилась');
-    }
     await awaiter(() => {
-      if (getStakeCount() !== 1) {
-        return true;
-      }
-      if (getMaximumStake() !== 9007199254740991) {
-        return true;
-      }
-      return false;
-    });
-    const stakeCount = getStakeCount();
-    if (stakeCount !== 1) {
-      const resultMessageElement = document.querySelector(
-        '[class*="results__ResultsMessage-"]'
+      return (
+        getMaximumStake(true) ||
+        document.querySelector(
+          'img[alt="status"][src="/public/8297d8229b6d049f4c11.svg"]'
+        )
       );
-      if (resultMessageElement) {
-        const resultMessage = text(resultMessageElement).replace(
-          /^([a-zA-Z]*Icon)/,
-          '$&\n'
-        );
-        if (/Выбранный Вами исход недоступен/i.test(resultMessage)) {
-          throw new JsFailError('Исход недоступен');
-        }
-      }
-      throw new JsFailError(`В ставке не 1 купон (${stakeCount})`);
+    });
+    if (
+      document.querySelector(
+        'img[alt="status"][src="/public/8297d8229b6d049f4c11.svg"]'
+      )
+    ) {
+      throw new JsFailError('Исход недоступен');
     }
-    if (getMaximumStake() === 9007199254740991) {
-      throw new JsFailError('Максимальная ставка не поменялась');
+    const maximumStake = getMaximumStake();
+    if (!maximumStake) {
+      throw new JsFailError('Максимум не появился');
     }
+    log(`Максимум появился ${maximumStake}`, 'cadetblue', true);
+    // await awaiter(() => {
+    //   if (getStakeCount() !== 1) {
+    //     return true;
+    //   }
+    //   if (getMaximumStake() !== 9007199254740991) {
+    //     return true;
+    //   }
+    //   return false;
+    // });
+    // const stakeCount = getStakeCount();
+    // if (stakeCount !== 1) {
+    //   const resultMessageElement = document.querySelector(
+    //     '[class*="results__ResultsMessage-"]'
+    //   );
+    //   if (resultMessageElement) {
+    //     const resultMessage = text(resultMessageElement).replace(
+    //       /^([a-zA-Z]*Icon)/,
+    //       '$&\n'
+    //     );
+    //     if (/Выбранный Вами исход недоступен/i.test(resultMessage)) {
+    //       throw new JsFailError('Исход недоступен');
+    //     }
+    //   }
+    //   log(`В купоне не 1 ставка (${stakeCount})`, 'steelblue');
+
+    //   const oneStake = await awaiter(() => getStakeCount() === 1);
+    //   if (oneStake) {
+    //     log('В купоне стала одна ставка', 'steelblue');
+    //   } else {
+    //     throw new JsFailError(`В купоне не стала 1 ставка (${stakeCount})`);
+    //   }
+    // }
+    // if (getMaximumStake() === 9007199254740991) {
+    //   throw new JsFailError('Максимальная ставка не поменялась');
+    // }
   }
 
   /* ======================================================================== */
   /*                    Вывод информации об открытой ставке                   */
   /* ======================================================================== */
 
-  const eventNameSelector = '[class*="bet-card__MatchName-"]';
+  const eventNameSelector =
+    '[class*="bet-card__MatchName-"], .sticky-column:last-child > :nth-child(1) > :nth-child(1) [href]';
   // const marketNameSelector = '';
-  const betNameSelector = '[class*="bet-card__OutcomeName-"]';
+  const betNameSelector =
+    '[class*="bet-card__OutcomeName-"], .sticky-column:last-child > :nth-child(1) > :nth-child(1) .align-baseline ~ span';
 
   const eventNameElement = document.querySelector(eventNameSelector);
   // const marketNameElement = document.querySelector(marketNameSelector);

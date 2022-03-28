@@ -10,7 +10,7 @@ import isClone from '../helpers/isClone';
 
 export const maximumStakeSelector = isClone()
   ? ''
-  : '[class*="bet-card-wrap__BetCardWrap-"] [class*="single__InfoMax-"]:nth-child(5)';
+  : '[class*="bet-card-wrap__BetCardWrap-"] [class*="single__InfoMax-"]:nth-child(5), .sticky-column:last-child > :nth-child(1) > :nth-child(1) .align-baseline ~ :last-child > :nth-child(3) > :nth-child(1)';
 
 const maximumStakeOptions: StakeInfoValueOptions = {
   name: 'maximumStake',

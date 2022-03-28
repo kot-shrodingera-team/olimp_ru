@@ -6,7 +6,9 @@ import { log } from '@kot-shrodingera-team/germes-utils';
 import getBet from '../helpers/getBet';
 import isClone from '../helpers/isClone';
 
-export const coefficientSelector = isClone() ? '' : '.cur-val';
+export const coefficientSelector = isClone()
+  ? ''
+  : '.cur-val, .sticky-column:last-child > :nth-child(1) > :nth-child(1) .align-baseline > :nth-child(2) > :nth-child(1) > span';
 
 const coefficientOptions: StakeInfoValueOptions = {
   name: 'coefficient',

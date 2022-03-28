@@ -8,25 +8,45 @@ const openEvent = async (): Promise<void> => {
     return;
   }
   // ЦУПИС
-  if (window.location.href === worker.EventUrl) {
+
+  // // https://www.olimp.bet/live/10/7052884/74315014
+  // const urlRegex = /\/live\/(\d+)\/(\d+)\/(\d+)$/i;
+  // https://www.olimp.bet/live/5/74347472
+  const urlRegex = /\/live\/(\d+)\/(\d+)$/i;
+  const urlMatch = worker.EventUrl.match(urlRegex);
+  if (!urlMatch) {
+    throw new JsFailError(
+      'Не удалось распарсить адрес события. Обратитесь в ТП'
+    );
+  }
+
+  const sportId = urlMatch[1];
+  const eventId = urlMatch[2];
+
+  const url = worker.EventUrl.replace(/(\d+)\/(\d+)$/, '$2');
+
+  if (window.location.href === url) {
     log('Уже открыто нужное событие', 'steelblue');
     return;
   }
-  const live = document.querySelector<HTMLElement>('[href="/live"]');
-  if (!live) {
-    throw new JsFailError('Не найдена кнопка перехода на Live');
-  }
-  log('Переходим на Live', 'orange');
-  live.click();
-  log('Ищем событие', 'steelblue');
-  const event = await getElement<HTMLElement>(
-    `.default__Link-sc-14zuwl2-0[href*="${worker.EventId}"]`
+
+  const sportButton = await getElement<HTMLElement>(
+    `[href="/live/${sportId}"]`
   );
-  if (!event) {
+  if (!sportButton) {
+    throw new JsFailError('Не найдена кнопка нужного спорта');
+  }
+  sportButton.click();
+
+  const eventButton = await getElement<HTMLElement>(
+    `[href="/live/${sportId}/${eventId}"]`,
+    10000
+  );
+  if (!eventButton) {
     throw new JsFailError('Событие не найдено');
   }
   log('Переходим на событие', 'orange');
-  event.click();
+  eventButton.click();
 };
 
 export default openEvent;

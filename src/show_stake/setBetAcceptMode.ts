@@ -1,4 +1,4 @@
-import { log, ri, text } from '@kot-shrodingera-team/germes-utils';
+import { getElement, log } from '@kot-shrodingera-team/germes-utils';
 import { JsFailError } from '@kot-shrodingera-team/germes-utils/errors';
 import isClone from '../helpers/isClone';
 
@@ -8,42 +8,83 @@ const setBetAcceptMode = async (): Promise<void> => {
     return;
   }
 
-  const modes = ['Никогда', 'При повышении', 'Всегда'];
-  const betAcceptModeActiveElement = document.querySelector(
-    '[class*="settings__SettingsTab-"].active'
+  const settingsTab = document.querySelector<HTMLElement>(
+    '.betslip__CouponTab-tyjzhu-2.jBiqQG, .sticky-column:last-child > :nth-child(1) > :nth-child(1) > :nth-child(1) > :nth-child(3)'
   );
-  if (!betAcceptModeActiveElement) {
-    throw new JsFailError('Не найдена текущая опция режима принятия ставки');
+  if (!settingsTab) {
+    throw new JsFailError('Не найдена вкладка настроек');
   }
-  const betAcceptModeActive = text(betAcceptModeActiveElement);
-  const targetMode = modes[worker.StakeAcceptRuleShoulder];
+  settingsTab.click();
 
-  if (ri`${targetMode}`.test(betAcceptModeActive)) {
-    log(
-      `Уже выбран режим принятия ставки "${betAcceptModeActive}"`,
-      'steelblue'
-    );
-    return;
-  }
+  await getElement('[name="changeAccept"]');
 
-  const betAcceptModes = [
-    ...document.querySelectorAll<HTMLElement>(
-      '[class*="settings__SettingsTab-"]'
-    ),
-  ];
-  const targetModeElement = betAcceptModes.find((mode) =>
-    ri`${targetMode}`.test(text(mode))
+  const acceptInputs = document.querySelectorAll<HTMLInputElement>(
+    '[name="changeAccept"]'
   );
-  if (!targetModeElement) {
+  if (acceptInputs.length === 0) {
+    throw new JsFailError('Не найдены опции принятия ставок');
+  }
+  if (acceptInputs.length !== 3) {
+    throw new JsFailError('Найдено не 3 опции принятия ставок');
+  }
+
+  if (worker.StakeAcceptRuleShoulder === 0) {
+    if (acceptInputs[0].checked) {
+      log(
+        'Уже выбран режим принятия ставок только с текущим коэффициентом',
+        'steelblue'
+      );
+    } else {
+      log(
+        'Выбираем режим принятия ставок только с текущим коэффициентом',
+        'orange'
+      );
+      acceptInputs[0].click();
+    }
+  } else if (worker.StakeAcceptRuleShoulder === 1) {
+    if (acceptInputs[1].checked) {
+      log(
+        'Уже выбран режим принятия ставок только с повышением коэффициента',
+        'steelblue'
+      );
+    } else {
+      log(
+        'Выбираем режим принятия ставок только с повышением коэффициента',
+        'orange'
+      );
+      acceptInputs[1].click();
+    }
+  } else if (worker.StakeAcceptRuleShoulder === 2) {
+    if (acceptInputs[2].checked) {
+      log(
+        'Уже выбран режим принятия ставок с любым изменением коэффициента',
+        'steelblue'
+      );
+    } else {
+      log(
+        'Выбираем режим принятия ставок с любым изменением коэффициента',
+        'orange'
+      );
+      acceptInputs[2].click();
+    }
+  }
+
+  const couponTab = document.querySelector<HTMLElement>(
+    '.betslip__CouponTab-tyjzhu-2.jBiqQG, .sticky-column:last-child > :nth-child(1) > :nth-child(1) > :nth-child(1) > :nth-child(1)'
+  );
+  if (!couponTab) {
+    throw new JsFailError('Не найдена вкладка корзины');
+  }
+  couponTab.click();
+
+  const anyBet = await getElement(
+    '.sticky-column:last-child > :nth-child(1) > :nth-child(1) [href]'
+  );
+  if (!anyBet) {
     throw new JsFailError(
-      `Не найдена опция режима принятия ставки "${targetMode}"`
+      'Не дождались появления ставки в купоне после перехода на вкладку корзины'
     );
   }
-  log(
-    `Переключаем режим принятия ставки с "${betAcceptModeActive}" на "${targetMode}"`,
-    'orange'
-  );
-  targetModeElement.click();
 };
 
 export default setBetAcceptMode;

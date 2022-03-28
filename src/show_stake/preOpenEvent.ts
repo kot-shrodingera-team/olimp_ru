@@ -3,6 +3,8 @@ import {
   checkCurrency,
   getElement,
   log,
+  sleep,
+  // sleep,
 } from '@kot-shrodingera-team/germes-utils';
 import {
   NewUrlError,
@@ -39,18 +41,29 @@ const preOpenEvent = async (): Promise<void> => {
     return;
   }
   // ЦУПИС
-  const couponTabInactive = document.querySelector<HTMLElement>(
-    '.betslip__CouponTab-tyjzhu-2.jBiqQG'
-  );
-  if (couponTabInactive) {
-    log('Открыта не вкладка с купонами. Переключаем вкладку', 'orange');
-    couponTabInactive.click();
-    const couponTabActive = await getElement(
-      '.betslip__CouponTab-tyjzhu-2.cLoJdY'
-    );
-    if (!couponTabActive) {
-      throw new JsFailError('Вкладка так и не переключилась');
+  if (!window.location.pathname.startsWith('/live')) {
+    log('Открыт не лайв', 'steelblue');
+    const liveButton = await getElement<HTMLElement>('[href="/live"]');
+    if (!liveButton) {
+      throw new JsFailError('Не найдена кнопка перехода на лайв');
     }
+    log('Переходим на лайв', 'orange');
+    liveButton.click();
+    await sleep(1000);
+  }
+
+  const couponTab = await getElement<HTMLElement>(
+    '.betslip__CouponTab-tyjzhu-2.jBiqQG, .sticky-column:last-child > :nth-child(1) > :nth-child(1) > :nth-child(1) > :nth-child(1)'
+  );
+  if (!couponTab) {
+    throw new JsFailError('Не найдена вкладка купона "Корзина"');
+  }
+  if (!couponTab.classList.contains('active')) {
+    log('Открыта не вкладка купона "Корзина"', 'steelblue');
+    log('Переходим на вкладку купона "Корзина"', 'orange');
+    couponTab.click();
+  } else {
+    log('Открыта вкладка купона "Корзина"', 'cadetblue', true);
   }
 
   /* ======================================================================== */
@@ -61,6 +74,7 @@ const preOpenEvent = async (): Promise<void> => {
   if (!couponCleared) {
     throw new JsFailError('Не удалось очистить купон');
   }
+  // await sleep(100);
 };
 
 export default preOpenEvent;

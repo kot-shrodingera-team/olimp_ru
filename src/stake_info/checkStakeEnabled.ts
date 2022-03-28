@@ -36,7 +36,7 @@ const checkStakeEnabled = checkStakeEnabledGenerator({
     {
       selector: isClone()
         ? '.singles .item.betslip-disabled'
-        : '[class*="bet-card__LockedMatch"]',
+        : '[class*="bet-card__LockedMatch"], .warning-message',
       message: 'заблокирована',
     },
   ],

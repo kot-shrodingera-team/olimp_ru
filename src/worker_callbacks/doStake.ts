@@ -36,7 +36,7 @@ const doStake = doStakeGenerator({
   // preCheck,
   doStakeButtonSelector: isClone()
     ? 'button.placeBetButton'
-    : '#betslip button[type="submit"]',
+    : '#betslip button[type="submit"], .sticky-column:last-child button[type="submit"]',
   // errorClasses: [
   //   {
   //     className: '',

@@ -22,7 +22,10 @@ const clearCoupon = clearCouponGenerator({
   getStakeCount,
   apiClear: isClone() ? apiClear : undefined,
   // clearSingleSelector: '',
-  clearAllSelector: isClone() ? '' : '[class*="betslip-body__ClearAll-"]',
+  clearAllSelector: isClone()
+    ? ''
+    : '[class*="betslip-body__ClearAll-"], .sticky-column:last-child > :nth-child(1) > :nth-child(1) > :nth-child(2) > :nth-child(3) > :nth-child(1) > :nth-child(1)',
+  // селектор указывает на button или span внутри button, в любом случае click работает
   // postCheck,
   // context: () => document,
 });

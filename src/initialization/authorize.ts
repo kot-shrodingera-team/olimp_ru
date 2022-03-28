@@ -3,6 +3,7 @@ import {
   getElement,
   getPhoneLoginData,
   log,
+  sleep,
   // resolveRecaptcha,
 } from '@kot-shrodingera-team/germes-utils';
 import { setReactInputValue } from '@kot-shrodingera-team/germes-utils/reactUtils';
@@ -15,13 +16,14 @@ const preInputCheck = async (): Promise<boolean> => {
   if (isClone()) {
     return true;
   }
-  const phoneInput = document.querySelector(
+  const phoneInput = await getElement(
     'input[name="phone"], input[name="login"]'
   );
   if (!phoneInput) {
     log('Не найдено поле ввода телефона', 'crimson');
     return false;
   }
+  await sleep(100);
   const phoneData = getPhoneLoginData();
   if (phoneData) {
     setReactInputValue(phoneInput, `+7${phoneData.nsn}`);
@@ -32,7 +34,9 @@ const preInputCheck = async (): Promise<boolean> => {
     );
     return false;
   }
-  const submitButton = document.querySelector<HTMLElement>('button.submit');
+  const submitButton = await getElement<HTMLElement>(
+    'button.submit, button[type="submit"]'
+  );
   if (!submitButton) {
     log('Не найдена кнопка входа', 'crimson');
     return false;
@@ -81,8 +85,11 @@ const authorize = authorizeGenerator({
   openForm: isClone()
     ? undefined
     : {
-        selector: 'button[class*="not-autorized-bar__ButtonAsLink-"]',
-        openedSelector: '[class*="form-wrap__FormWrap-"]',
+        selector:
+          // 'button[class*="not-autorized-bar__ButtonAsLink-"], #header > :nth-child(1) > :nth-child(2) > :nth-child(3) > button:nth-child(1)',
+          'button[class*="not-autorized-bar__ButtonAsLink-"], #header > :nth-child(1) > :nth-child(2) > :nth-child(4) > button:nth-child(1)',
+        openedSelector:
+          '[class*="form-wrap__FormWrap-"], #modal-root > :nth-child(1) > :nth-child(1)',
         // loopCount: 10,
         // triesInterval: 1000,
         // afterOpenDelay: 0,

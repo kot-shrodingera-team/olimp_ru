@@ -28,6 +28,15 @@ interface OlimpBetslip {
   [key: string]: OlimpCloneBet;
 }
 
+export interface OutcomeReactInstance {
+  return: {
+    memoizedProps: {
+      id: string;
+      basketId: string;
+    };
+  };
+}
+
 declare global {
   // interface GermesData {}
   interface Window {

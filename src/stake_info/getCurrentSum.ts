@@ -6,7 +6,7 @@ import isClone from '../helpers/isClone';
 
 export const sumInputSelector = isClone()
   ? 'input.stakeInput'
-  : '[class*="bet-card-wrap__BetCardWrap-"] input[class*="number-light__Input-"]';
+  : '[class*="bet-card-wrap__BetCardWrap-"] input[class*="number-light__Input-"], #MINUS ~ input';
 
 const currentSumOptions: StakeInfoValueOptions = {
   name: 'currentSum',

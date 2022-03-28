@@ -6,7 +6,7 @@ import isClone from '../helpers/isClone';
 
 export const balanceSelector = isClone()
   ? '.js-showbalance'
-  : '[class*="user-bars__Balance-"]';
+  : '[class*="user-bars__Balance-"], [title="Пополнить баланс"]';
 
 const balanceOptions: StakeInfoValueOptions = {
   name: 'balance',
